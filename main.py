@@ -48,6 +48,14 @@ def process_ai_sync(frame, model_type="dnn"):
     res = pose.process(img_rgb)
     
     if res.pose_landmarks:
+        landmarks_list = []
+        for lm in res.pose_landmarks.landmark:
+            landmarks_list.append({
+                "x": float(lm.x),
+                "y": float(lm.y),
+                "z": float(lm.z),
+                "visibility": float(lm.visibility)
+            })
         lms = [[lm.x, lm.y, lm.z, lm.visibility] for lm in res.pose_landmarks.landmark]
         features = np.array(lms).flatten().reshape(1, -1)
         
@@ -59,8 +67,12 @@ def process_ai_sync(frame, model_type="dnn"):
             idx = int(rf_model.predict(features)[0])
             conf = float(np.max(rf_model.predict_proba(features)))
             
-        return {"label": LABELS[idx], "confidence": conf}
-    return {"label": "NONE", "confidence": 0.0}
+        return {
+            "label": LABELS[idx], 
+            "confidence": conf,
+            "landmarks": landmarks_list # Ngăn nắp từ 0 -> 32
+        }
+    return {"label": "NONE", "confidence": 0.0, "landmarks": []}
 
 
 # --- HÀM BỔ TRỢ GIẢI MÃ ẢNH (Tránh block thread chính) ---
