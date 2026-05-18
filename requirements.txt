@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-socketio
+tensorflow
+opencv-python
+mediapipe
+numpy
+scikit-learn
+joblib
+python-dotenv
